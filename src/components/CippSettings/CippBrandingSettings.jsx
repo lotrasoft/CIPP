@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CippIcons } from "../../utils/icon-registry"
 import {
   Button,
   Typography,
@@ -14,7 +15,6 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import { Add, Delete, Palette } from "@mui/icons-material";
 import { Grid } from "@mui/system";
 import { ApiGetCall, ApiPostCall } from "../../api/ApiCall";
 import { useSettings } from "../../hooks/use-settings";
@@ -33,7 +33,7 @@ import {
   normalizeLogoImageIds,
   normalizeLogoUploads,
 } from "../CippPdf/resolveCoverImage";
-import { REPORT_COLOUR_ROLES } from "../CippPdf/reportTheme";
+import { FOOTER_MAX_LENGTH, REPORT_COLOUR_ROLES, WATERMARK_MAX_LENGTH } from "../CippPdf/reportTheme";
 import { BRANDING_GALLERY_QUERY_KEY } from "../CippPdf/useBrandingSettings";
 import { useForm } from "react-hook-form";
 
@@ -78,7 +78,7 @@ const FOOTER_TOOLTIP =
   "Text shown at the bottom of every report page. Type % for CIPP's variables, plus %reportname% and %reportdate% which reports add. Report templates can override this or switch it off individually.";
 
 const WATERMARK_TOOLTIP =
-  "Diagonal text drawn faintly across every page of a report, cover included — e.g. DRAFT or CONFIDENTIAL. Typing text is enough to show it; the toggle only exists to switch it off without losing the wording.";
+  "Diagonal text drawn faintly across every page of a report, cover included. Type % for CIPP's variables (e.g. %tenantname%), or a static mark such as DRAFT. Typing text is enough to show it; the toggle only exists to switch it off without losing the wording.";
 
 const REPORT_DEFAULTS_TOOLTIP =
   "Which preset each report reaches for when nothing else says otherwise. A report template with its own preset still wins over this, and this still wins over the default branding above.";
@@ -156,7 +156,7 @@ const GalleryTile = ({
       }}
     >
       {add ? (
-        <Add sx={{ fontSize: 32, color: "text.secondary" }} />
+        <CippIcons.Add sx={{ fontSize: 32, color: "text.secondary" }} />
       ) : empty ? (
         <Typography
           variant="caption"
@@ -214,7 +214,7 @@ const GalleryTile = ({
           "&.Mui-disabled": { bgcolor: "rgba(0, 0, 0, 0.35)", color: "rgba(255,255,255,0.5)" },
         }}
       >
-        <Delete sx={{ fontSize: 16 }} />
+        <CippIcons.Delete sx={{ fontSize: 16 }} />
       </IconButton>
     )}
   </Box>
@@ -822,7 +822,6 @@ const CippBrandingSettings = () => {
 
     const brandingData = buildLocalBranding();
 
-
     brandingApi.mutate({
       url: "/api/ExecBrandingSettings",
       data: {
@@ -884,7 +883,6 @@ const CippBrandingSettings = () => {
       previewReportType: formControl.getValues("previewReportType") || reportTypeOptions[0],
     });
 
-
     brandingApi.mutate({
       url: "/api/ExecBrandingSettings",
       data: {
@@ -916,7 +914,9 @@ const CippBrandingSettings = () => {
         <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
           Branding
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{
+          color: "text.secondary"
+        }}>
           Customize your organization&apos;s branding for reports and documents. The default applies
           to every report; presets can be assigned to individual report templates instead.
         </Typography>
@@ -926,7 +926,14 @@ const CippBrandingSettings = () => {
         <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
           Editing
         </Typography>
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1}
+          useFlexGap
+          sx={{
+            flexWrap: "wrap",
+            alignItems: "center"
+          }}>
           <Chip
             label="Default"
             color={activePresetId ? "default" : "primary"}
@@ -946,7 +953,7 @@ const CippBrandingSettings = () => {
           ))}
           <Button
             size="small"
-            startIcon={<Add />}
+            startIcon={<CippIcons.Add />}
             onClick={() => openNameDialog("create")}
             disabled={busy}
           >
@@ -963,7 +970,7 @@ const CippBrandingSettings = () => {
               <Button
                 size="small"
                 color="error"
-                startIcon={<Delete />}
+                startIcon={<CippIcons.Delete />}
                 onClick={handleDeletePreset}
                 disabled={busy}
               >
@@ -972,7 +979,9 @@ const CippBrandingSettings = () => {
             </>
           )}
         </Stack>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{
+          color: "text.secondary"
+        }}>
           {activePreset
             ? `Changes below apply to the "${activePreset.name}" preset only.`
             : "Changes below apply to every report that has no preset assigned."}
@@ -980,7 +989,13 @@ const CippBrandingSettings = () => {
       </Box>
 
       <Box>
-        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{
+            alignItems: "center",
+            mb: 1
+          }}>
           <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
             Default Preset Per Report
           </Typography>
@@ -1017,7 +1032,12 @@ const CippBrandingSettings = () => {
               : "New branding preset"}
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              mb: 2
+            }}>
             {nameDialog === "rename"
               ? "Templates already pointing at this preset keep pointing at it."
               : "The preset starts as a copy of what is currently on screen, so you only have to change what differs."}
@@ -1048,7 +1068,13 @@ const CippBrandingSettings = () => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <Box>
-              <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+              <Stack
+                direction="row"
+                spacing={0.5}
+                sx={{
+                  alignItems: "center",
+                  mb: 1
+                }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                   Logo
                 </Typography>
@@ -1148,7 +1174,13 @@ const CippBrandingSettings = () => {
             </Box>
 
             <Box>
-              <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+              <Stack
+                direction="row"
+                spacing={0.5}
+                sx={{
+                  alignItems: "center",
+                  mb: 1
+                }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                   Cover Image
                 </Typography>
@@ -1264,11 +1296,14 @@ const CippBrandingSettings = () => {
               <Box>
                 <Stack
                   direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  sx={{ mb: 1.5 }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                  sx={{
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1.5
+                  }}>
+                  <Stack direction="row" spacing={0.5} sx={{
+                    alignItems: "center"
+                  }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                       {livePreview ? "Full Report Preview" : "Cover Preview"}
                     </Typography>
@@ -1321,7 +1356,13 @@ const CippBrandingSettings = () => {
                 }}
               >
                 <Box sx={{ flex: "0 0 auto" }}>
-                  <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+                  <Stack
+                    direction="row"
+                    spacing={0.5}
+                    sx={{
+                      alignItems: "center",
+                      mb: 1
+                    }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                       Brand Color
                     </Typography>
@@ -1336,7 +1377,13 @@ const CippBrandingSettings = () => {
                 </Box>
 
                 <Box sx={{ flex: "0 0 auto" }}>
-                  <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+                  <Stack
+                    direction="row"
+                    spacing={0.5}
+                    sx={{
+                      alignItems: "center",
+                      mb: 1
+                    }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                       Accent Color
                     </Typography>
@@ -1367,7 +1414,13 @@ const CippBrandingSettings = () => {
               </Box>
 
               <Box>
-                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{
+                    alignItems: "center",
+                    mb: 1
+                  }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Report Colors
                   </Typography>
@@ -1380,7 +1433,13 @@ const CippBrandingSettings = () => {
                 <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
                   {REPORT_COLOUR_ROLES.map((role) => (
                     <Box key={role.setting} sx={{ flex: "0 0 auto" }}>
-                      <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        sx={{
+                          alignItems: "center",
+                          mb: 1
+                        }}>
                         <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                           {role.label}
                         </Typography>
@@ -1398,7 +1457,13 @@ const CippBrandingSettings = () => {
               </Box>
 
               <Box>
-                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{
+                    alignItems: "center",
+                    mb: 1
+                  }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Page Footer
                   </Typography>
@@ -1412,12 +1477,12 @@ const CippBrandingSettings = () => {
                     name="footerText"
                     formControl={formControl}
                     placeholder="%tenantname% — prepared by Contoso IT — %reportdate%"
-                    helperText="Type % for variables. Reports add %reportname% and %reportdate%."
+                    helperText={`Type % for variables. Reports add %reportname% and %reportdate%. After substitution, text is capped at ${FOOTER_MAX_LENGTH} characters.`}
                     includeSystemVariables={true}
                     validators={{
                       maxLength: {
-                        value: 200,
-                        message: "Footer text must be 200 characters or fewer",
+                        value: FOOTER_MAX_LENGTH,
+                        message: `Footer text must be ${FOOTER_MAX_LENGTH} characters or fewer`,
                       },
                     }}
                   />
@@ -1426,17 +1491,24 @@ const CippBrandingSettings = () => {
                     name="coverFooterText"
                     label="Cover Note"
                     placeholder="Blank = each report's own wording"
-                    helperText="Replaces the confidentiality note on cover pages"
+                    helperText={`Replaces the confidentiality note on cover pages. After substitution, text is capped at ${FOOTER_MAX_LENGTH} characters.`}
                     includeSystemVariables={true}
                     formControl={formControl}
                     validators={{
                       maxLength: {
-                        value: 200,
-                        message: "Cover note must be 200 characters or fewer",
+                        value: FOOTER_MAX_LENGTH,
+                        message: `Cover note must be ${FOOTER_MAX_LENGTH} characters or fewer`,
                       },
                     }}
                   />
-                  <Stack direction="row" spacing={2} flexWrap="wrap">
+                  <Stack
+                    useFlexGap
+                    direction="row"
+                    sx={{
+                      columnGap: 2,
+                      rowGap: 1,
+                      flexWrap: "wrap"
+                    }}>
                     <CippFormComponent
                       type="switch"
                       name="showFooter"
@@ -1454,7 +1526,13 @@ const CippBrandingSettings = () => {
               </Box>
 
               <Box>
-                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{
+                    alignItems: "center",
+                    mb: 1
+                  }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Watermark
                   </Typography>
@@ -1462,14 +1540,16 @@ const CippBrandingSettings = () => {
                 </Stack>
                 <Stack spacing={1}>
                   <CippFormComponent
-                    type="textField"
+                    type="textFieldWithVariables"
                     name="watermarkText"
                     formControl={formControl}
-                    placeholder="DRAFT"
+                    placeholder="%tenantname%"
+                    helperText={`Type % for variables. After substitution, the mark is capped at ${WATERMARK_MAX_LENGTH} characters.`}
+                    includeSystemVariables={true}
                     validators={{
                       maxLength: {
-                        value: 40,
-                        message: "Watermark text must be 40 characters or fewer",
+                        value: WATERMARK_MAX_LENGTH,
+                        message: `Watermark text must be ${WATERMARK_MAX_LENGTH} characters or fewer`,
                       },
                     }}
                   />
@@ -1488,7 +1568,7 @@ const CippBrandingSettings = () => {
                   size="small"
                   onClick={handleSave}
                   disabled={busy}
-                  startIcon={<Palette />}
+                  startIcon={<CippIcons.Palette />}
                 >
                   {activePreset ? `Save "${activePreset.name}"` : "Save Branding"}
                 </Button>
